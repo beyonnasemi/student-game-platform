@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 게임 플랫폼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .connection-status {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: #155724;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: #28a745;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .game-header {
+            padding: 20px;
+            background: linear-gradient(45deg, #f8f9ff, #e8f2ff);
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .game-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .game-author {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .game-description {
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .game-iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            background: #f5f5f5;
+        }
+
+        .game-actions {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 20px;
+        }
+
+        .btn-fullscreen {
+            background: #2196F3;
+        }
+
+        .comments-section {
+            border-top: 1px solid #e1e5e9;
+            padding: 20px;
+        }
+
+        .comments-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .comment-form {
+            margin-bottom: 20px;
+        }
+
+        .comment-form input, .comment-form textarea {
+            margin-bottom: 10px;
+        }
+
+        .comment {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            margin: 5% auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .modal-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+
+        .no-games {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .no-games h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 학생 게임 플랫폼</h1>
+            <p class="subtitle">HTML 게임을 업로드하고 친구들과 함께 즐겨보세요!</p>
+        </header>
+
+        <!-- Firebase 연결 상태 -->
+        <div class="connection-status">
+            <h3>🔥 Firebase 연결 상태: <span id="connectionStatus"><span class="status-indicator"></span>자동 연결 중...</span></h3>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h2 style="margin-bottom: 20px; color: #333;">새 게임 업로드</h2>
+            
+            <div class="form-group">
+                <label for="gameName">게임 이름</label>
+                <input type="text" id="gameName" placeholder="게임 제목을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="authorName">제작자 이름</label>
+                <input type="text" id="authorName" placeholder="본인의 이름을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="gameDescription">게임 설명</label>
+                <textarea id="gameDescription" placeholder="게임에 대한 간단한 설명을 작성하세요"></textarea>
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div>
+                    <h3>📁 HTML 파일 업로드</h3>
+                    <p>HTML 파일을 여기로 드래그하거나 클릭해서 선택하세요</p>
+                    <input type="file" id="fileInput" accept=".html,.htm" style="display: none;">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">파일 선택</button>
+                </div>
+            </div>
+
+            <button class="btn" id="uploadBtn" style="margin-top: 20px;" disabled>게임 업로드</button>
+        </div>
+
+        <div id="gamesContainer">
+            <div class="loading">
+                <h3>Firebase 연결 중...</h3>
+                <p>잠시만 기다려주세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체화면 모달 -->
+    <div id="fullscreenModal" class="fullscreen-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">게임 플레이</h3>
+                <button class="close-btn" onclick="closeFullscreen()">닫기</button>
+            </div>
+            <iframe id="modalIframe" class="modal-iframe"></iframe>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase 설정 (자동으로 포함됨)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZZrjupXR5y85oErD6pwxionj8X4VQo8c",
+            authDomain: "game-platform-9611e.firebaseapp.com",
+            projectId: "game-platform-9611e",
+            storageBucket: "game-platform-9611e.firebasestorage.app",
+            messagingSenderId: "557335213368",
+            appId: "1:557335213368:web:4e2407a4219dbd59733dcd",
+            measurementId: "G-PMBD5W9MPC"
+        };
+
+        // 전역 변수
+        let db;
+        let app;
+        let isFirebaseInitialized = false;
+
+        // DOM 요소들
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const gamesContainer = document.getElementById('gamesContainer');
+        const uploadSection = document.getElementById('uploadSection');
+
+        // 페이지 로드 후 Firebase 자동 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+
+        // Firebase 초기화 함수
+        function initializeFirebase() {
+            try {
+                // Firebase 초기화
+                app = firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                isFirebaseInitialized = true;
+
+                // UI 업데이트
+                document.getElementById('connectionStatus').innerHTML = '<span class="status-indicator"></span>연결 완료!';
+
+                // 게임 목록 로드
+                loadGames();
+                setupEventListeners();
+
+                console.log('Firebase 연결이 완료되었습니다!');
+            } catch (error) {
+                console.error('Firebase 초기화 실패:', error);
+                document.getElementById('connectionStatus').innerHTML = '<span class="status-indicator" style="background-color: #dc3545;"></span>연결 실패';
+                gamesContainer.innerHTML = `
+                    <div class="error-message">
+                        Firebase 연결에 실패했습니다: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function setupEventListeners() {
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            uploadBtn.addEventListener('click', uploadGame);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            if (!file.name.toLowerCase().endsWith('.html') && !file.name.toLowerCase().endsWith('.htm')) {
+                alert('HTML 파일만 업로드할 수 있습니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const htmlContent = e.target.result;
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = `"${file.name}" 업로드 준비완료`;
+                uploadBtn.dataset.htmlContent = htmlContent;
+                uploadBtn.dataset.fileName = file.name;
+            };
+            reader.readAsText(file);
+        }
+
+        async function uploadGame() {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            const gameName = document.getElementById('gameName').value.trim();
+            const authorName = document.getElementById('authorName').value.trim();
+            const gameDescription = document.getElementById('gameDescription').value.trim();
+            const htmlContent = uploadBtn.dataset.htmlContent;
+            const fileName = uploadBtn.dataset.fileName;
+
+            if (!gameName || !authorName || !htmlContent) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '업로드 중...';
+
+            try {
+                // Firestore에 게임 데이터 추가
+                const docRef = await db.collection('games').add({
+                    name: gameName,
+                    author: authorName,
+                    description: gameDescription,
+                    htmlContent: htmlContent,
+                    fileName: fileName,
+                    uploadDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    comments: []
+                });
+
+                console.log('게임이 업로드되었습니다. ID:', docRef.id);
+                clearForm();
+                alert('게임이 성공적으로 업로드되었습니다!');
+            } catch (error) {
+                console.error('게임 업로드 실패:', error);
+                alert('게임 업로드에 실패했습니다. 다시 시도해주세요.');
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '게임 업로드';
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('gameName').value = '';
+            document.getElementById('authorName').value = '';
+            document.getElementById('gameDescription').value = '';
+            fileInput.value = '';
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '게임 업로드';
+            delete uploadBtn.dataset.htmlContent;
+            delete uploadBtn.dataset.fileName;
+        }
+
+        function loadGames() {
+            if (!isFirebaseInitialized) return;
+
+            gamesContainer.innerHTML = '<div class="loading"><h3>게임 목록을 불러오는 중...</h3></div>';
+
+            // 실시간 리스너 설정
+            db.collection('games').onSnapshot((snapshot) => {
+                const games = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    games.push({
+                        id: doc.id,
+                        ...data,
+                        uploadDate: data.uploadDate ? data.uploadDate.toDate().toLocaleDateString('ko-KR') : '날짜 불명'
+                    });
+                });
+
+                // 업로드 날짜 기준으로 최신순 정렬
+                games.sort((a, b) => {
+                    if (!a.uploadDate || !b.uploadDate) return 0;
+                    return new Date(b.uploadDate) - new Date(a.uploadDate);
+                });
+
+                displayGames(games);
+            }, (error) => {
+                console.error('게임 로딩 실패:', error);
+                gamesContainer.innerHTML = `
+                    <div class="error-message">
+                        게임 목록을 불러오는데 실패했습니다: ${error.message}
+                    </div>
+                `;
+            });
+        }
+
+        function displayGames(games) {
+            if (games.length === 0) {
+                gamesContainer.innerHTML = `
+                    <div class="no-games">
+                        <h3>아직 업로드된 게임이 없습니다</h3>
+                        <p>첫 번째 게임을 업로드해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const gamesGrid = document.createElement('div');
+            gamesGrid.className = 'games-grid';
+
+            games.forEach(game => {
+                const gameCard = createGameCard(game);
+                gamesGrid.appendChild(gameCard);
+            });
+
+            gamesContainer.innerHTML = '';
+            gamesContainer.appendChild(gamesGrid);
+        }
+
+        function createGameCard(game) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+
+            card.innerHTML = `
+                <div class="game-header">
+                    <div class="game-title">${escapeHtml(game.name)}</div>
+                    <div class="game-author">제작자: ${escapeHtml(game.author)}</div>
+                    <div class="game-description">${escapeHtml(game.description || '')}</div>
+                    <small style="color: #888;">업로드: ${game.uploadDate}</small>
+                </div>
+                
+                <iframe class="game-iframe" srcdoc="${escapeHtml(game.htmlContent)}" sandbox="allow-scripts allow-same-origin"></iframe>
+                
+                <div class="game-actions">
+                    <button class="btn btn-small btn-fullscreen" onclick="openFullscreen('${game.id}')">
+                        전체화면으로 플레이
+                    </button>
+                </div>
+                
+                <div class="comments-section">
+                    <div class="comments-header">💬 댓글 (${game.comments ? game.comments.length : 0})</div>
+                    
+                    <div class="comment-form">
+                        <input type="text" placeholder="닉네임" id="commentName-${game.id}" style="margin-bottom: 8px;">
+                        <textarea placeholder="댓글을 작성하세요..." id="commentText-${game.id}"></textarea>
+                        <button class="btn btn-small" onclick="addComment('${game.id}')">댓글 달기</button>
+                    </div>
+                    
+                    <div id="comments-${game.id}">
+                        ${(game.comments || []).map(comment => `
+                            <div class="comment">
+                                <div class="comment-author">${escapeHtml(comment.author)}</div>
+                                <div class="comment-text">${escapeHtml(comment.text)}</div>
+                                <small style="color: #888;">${comment.date}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // 전역 함수들
+        async function addComment(gameId) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            const nameInput = document.getElementById(`commentName-${gameId}`);
+            const textInput = document.getElementById(`commentText-${gameId}`);
+            
+            const name = nameInput.value.trim();
+            const text = textInput.value.trim();
+
+            if (!name || !text) {
+                alert('닉네임과 댓글 내용을 모두 입력해주세요.');
+                return;
+            }
+
+            try {
+                const comment = {
+                    author: name,
+                    text: text,
+                    date: new Date().toLocaleDateString('ko-KR')
+                };
+
+                // Firestore에 댓글 추가
+                await db.collection('games').doc(gameId).update({
+                    comments: firebase.firestore.FieldValue.arrayUnion(comment)
+                });
+
+                nameInput.value = '';
+                textInput.value = '';
+            } catch (error) {
+                console.error('댓글 추가 실패:', error);
+                alert('댓글 추가에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        function openFullscreen(gameId) {
+            // 현재 로드된 게임들에서 찾기
+            const gameCard = document.querySelector(`[onclick="openFullscreen('${gameId}')"]`).closest('.game-card');
+            const iframe = gameCard.querySelector('.game-iframe');
+            const title = gameCard.querySelector('.game-title').textContent;
+            const author = gameCard.querySelector('.game-author').textContent;
+
+            const modal = document.getElementById('fullscreenModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalIframe = document.getElementById('modalIframe');
+
+            modalTitle.textContent = `${title} - ${author}`;
+            modalIframe.srcdoc = iframe.srcdoc;
+            modal.style.display = 'block';
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('fullscreenModal');
+            const modalIframe = document.getElementById('modalIframe');
+            modal.style.display = 'none';
+            modalIframe.srcdoc = '';
+        }
+
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return '';
+            return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ESC 키로 전체화면 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
