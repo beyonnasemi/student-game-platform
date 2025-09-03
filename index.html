@@ -42,13 +42,14 @@
         }
 
         .connection-status {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            color: #155724;
-            text-align: center;
+            background: transparent;
+            border: none;
+            padding: 5px 0;
+            margin-bottom: 15px;
+            text-align: right;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: normal;
         }
 
         .status-indicator {
@@ -215,6 +216,22 @@
             background: #2196F3;
         }
 
+        .btn-edit {
+            background: #17a2b8;
+        }
+
+        .btn-edit:hover {
+            background: #138496;
+        }
+
+        .btn-delete {
+            background: #ff4444;
+        }
+
+        .btn-delete:hover {
+            background: #cc0000;
+        }
+
         .comments-section {
             border-top: 1px solid #e1e5e9;
             padding: 20px;
@@ -240,6 +257,11 @@
             border-radius: 10px;
             margin-bottom: 10px;
             border-left: 4px solid #667eea;
+            position: relative;
+        }
+
+        .comment:hover .comment-actions {
+            display: flex;
         }
 
         .comment-author {
@@ -251,6 +273,49 @@
         .comment-text {
             color: #555;
             line-height: 1.5;
+        }
+
+        .comment-actions {
+            display: none;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-tiny {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-edit-comment {
+            background: #6c757d;
+        }
+
+        .btn-delete-comment {
+            background: #dc3545;
+        }
+
+        .comment-edit-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .comment-edit-form textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .comment-edit-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
         }
 
         .fullscreen-modal {
@@ -299,6 +364,94 @@
             border: none;
         }
 
+        .edit-game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1001;
+        }
+
+        .edit-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .edit-form-group {
+            margin-bottom: 20px;
+        }
+
+        .edit-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .edit-form-group input,
+        .edit-form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .edit-form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .edit-modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .delete-confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1002;
+        }
+
+        .delete-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .delete-modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
         .no-games {
             text-align: center;
             padding: 60px 20px;
@@ -339,24 +492,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎮 해려문화예술학교 게임 플랫폼</h1>
+            <h1>🎮 학생 게임 플랫폼</h1>
             <p class="subtitle">HTML 게임을 업로드하고 친구들과 함께 즐겨보세요!</p>
         </header>
 
-        <!-- Firebase 연결 상태 -->
         <div class="connection-status">
-            <h3>DB연결상태 : <span id="connectionStatus"><span class="status-indicator"></span>자동 연결 중...</span></h3>
+            DB연결상태 : <span id="connectionStatus"><span class="status-indicator"></span>자동 연결 중...</span>
         </div>
-
-        <!-- 오른쪽 광고 영역 -->
-        <div class="ad-right">
-            <div class="ad-placeholder">
-                광고 영역<br>
-                160x100vh<br>
-                Right Banner
-            </div>
-        </div>
-    </div>
 
         <div class="upload-section" id="uploadSection">
             <h2 style="margin-bottom: 20px; color: #333;">새 게임 업로드</h2>
@@ -396,6 +538,44 @@
         </div>
     </div>
 
+    <!-- 게임 편집 모달 -->
+    <div id="editGameModal" class="edit-game-modal">
+        <div class="edit-modal-content">
+            <h3>✏️ 게임 정보 편집</h3>
+            <form id="editGameForm">
+                <div class="edit-form-group">
+                    <label for="editGameName">게임 이름</label>
+                    <input type="text" id="editGameName" required>
+                </div>
+                <div class="edit-form-group">
+                    <label for="editAuthorName">제작자 이름</label>
+                    <input type="text" id="editAuthorName" required>
+                </div>
+                <div class="edit-form-group">
+                    <label for="editGameDescription">게임 설명</label>
+                    <textarea id="editGameDescription"></textarea>
+                </div>
+                <div class="edit-modal-buttons">
+                    <button type="button" class="btn btn-small" onclick="closeEditModal()" style="background: #6c757d;">취소</button>
+                    <button type="button" class="btn btn-small btn-edit" id="saveEditBtn">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 게임 삭제 확인 모달 -->
+    <div id="deleteConfirmModal" class="delete-confirm-modal">
+        <div class="delete-modal-content">
+            <h3>🗑️ 게임 삭제</h3>
+            <p id="deleteGameTitle">이 게임을 정말 삭제하시겠습니까?</p>
+            <p style="color: #666; font-size: 14px; margin: 10px 0;">삭제된 게임은 복구할 수 없습니다.</p>
+            <div class="delete-modal-buttons">
+                <button class="btn btn-small" onclick="closeDeleteModal()" style="background: #6c757d;">취소</button>
+                <button class="btn btn-small btn-delete" id="confirmDeleteBtn">삭제</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 전체화면 모달 -->
     <div id="fullscreenModal" class="fullscreen-modal">
         <div class="modal-content">
@@ -412,7 +592,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase 설정 (자동으로 포함됨)
+        // Firebase 설정 (본인의 설정으로 교체하세요)
         const firebaseConfig = {
             apiKey: "AIzaSyAZZrjupXR5y85oErD6pwxionj8X4VQo8c",
             authDomain: "game-platform-9611e.firebaseapp.com",
@@ -427,6 +607,8 @@
         let db;
         let app;
         let isFirebaseInitialized = false;
+        let gameToEdit = null;
+        let gameToDelete = null;
 
         // DOM 요소들
         const uploadArea = document.getElementById('uploadArea');
@@ -440,18 +622,15 @@
             initializeFirebase();
         });
 
-        // Firebase 초기화 함수
+        // Firebase 초기화
         function initializeFirebase() {
             try {
-                // Firebase 초기화
                 app = firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 isFirebaseInitialized = true;
 
-                // UI 업데이트
                 document.getElementById('connectionStatus').innerHTML = '<span class="status-indicator"></span>연결 완료!';
 
-                // 게임 목록 로드
                 loadGames();
                 setupEventListeners();
 
@@ -459,11 +638,7 @@
             } catch (error) {
                 console.error('Firebase 초기화 실패:', error);
                 document.getElementById('connectionStatus').innerHTML = '<span class="status-indicator" style="background-color: #dc3545;"></span>연결 실패';
-                gamesContainer.innerHTML = `
-                    <div class="error-message">
-                        Firebase 연결에 실패했습니다: ${error.message}
-                    </div>
-                `;
+                gamesContainer.innerHTML = '<div class="error-message">Firebase 연결에 실패했습니다: ' + error.message + '</div>';
             }
         }
 
@@ -512,7 +687,7 @@
             reader.onload = function(e) {
                 const htmlContent = e.target.result;
                 uploadBtn.disabled = false;
-                uploadBtn.textContent = `"${file.name}" 업로드 준비완료`;
+                uploadBtn.textContent = '"' + file.name + '" 업로드 준비완료';
                 uploadBtn.dataset.htmlContent = htmlContent;
                 uploadBtn.dataset.fileName = file.name;
             };
@@ -540,7 +715,6 @@
             uploadBtn.textContent = '업로드 중...';
 
             try {
-                // Firestore에 게임 데이터 추가
                 const docRef = await db.collection('games').add({
                     name: gameName,
                     author: authorName,
@@ -578,7 +752,6 @@
 
             gamesContainer.innerHTML = '<div class="loading"><h3>게임 목록을 불러오는 중...</h3></div>';
 
-            // 실시간 리스너 설정
             db.collection('games').onSnapshot((snapshot) => {
                 const games = [];
                 snapshot.forEach((doc) => {
@@ -590,7 +763,6 @@
                     });
                 });
 
-                // 업로드 날짜 기준으로 최신순 정렬
                 games.sort((a, b) => {
                     if (!a.uploadDate || !b.uploadDate) return 0;
                     return new Date(b.uploadDate) - new Date(a.uploadDate);
@@ -599,22 +771,13 @@
                 displayGames(games);
             }, (error) => {
                 console.error('게임 로딩 실패:', error);
-                gamesContainer.innerHTML = `
-                    <div class="error-message">
-                        게임 목록을 불러오는데 실패했습니다: ${error.message}
-                    </div>
-                `;
+                gamesContainer.innerHTML = '<div class="error-message">게임 목록을 불러오는데 실패했습니다: ' + error.message + '</div>';
             });
         }
 
         function displayGames(games) {
             if (games.length === 0) {
-                gamesContainer.innerHTML = `
-                    <div class="no-games">
-                        <h3>아직 업로드된 게임이 없습니다</h3>
-                        <p>첫 번째 게임을 업로드해보세요!</p>
-                    </div>
-                `;
+                gamesContainer.innerHTML = '<div class="no-games"><h3>아직 업로드된 게임이 없습니다</h3><p>첫 번째 게임을 업로드해보세요!</p></div>';
                 return;
             }
 
@@ -634,55 +797,245 @@
             const card = document.createElement('div');
             card.className = 'game-card';
 
-            card.innerHTML = `
-                <div class="game-header">
-                    <div class="game-title">${escapeHtml(game.name)}</div>
-                    <div class="game-author">제작자: ${escapeHtml(game.author)}</div>
-                    <div class="game-description">${escapeHtml(game.description || '')}</div>
-                    <small style="color: #888;">업로드: ${game.uploadDate}</small>
-                </div>
+            card.innerHTML = 
+                '<div class="game-header">' +
+                    '<div class="game-title">' + escapeHtml(game.name) + '</div>' +
+                    '<div class="game-author">제작자: ' + escapeHtml(game.author) + '</div>' +
+                    '<div class="game-description">' + escapeHtml(game.description || '') + '</div>' +
+                    '<small style="color: #888;">업로드: ' + game.uploadDate + '</small>' +
+                '</div>' +
                 
-                <iframe class="game-iframe" srcdoc="${escapeHtml(game.htmlContent)}" sandbox="allow-scripts allow-same-origin"></iframe>
+                '<iframe class="game-iframe" srcdoc="' + escapeHtml(game.htmlContent) + '" sandbox="allow-scripts allow-same-origin"></iframe>' +
                 
-                <div class="game-actions">
-                    <button class="btn btn-small btn-fullscreen" onclick="openFullscreen('${game.id}')">
-                        전체화면으로 플레이
-                    </button>
-                </div>
+                '<div class="game-actions">' +
+                    '<button class="btn btn-small btn-fullscreen" onclick="openFullscreen(\'' + game.id + '\')">전체화면으로 플레이</button>' +
+                    '<button class="btn btn-small btn-edit" onclick="showEditModal(\'' + game.id + '\')">✏️ 편집</button>' +
+                    '<button class="btn btn-small btn-delete" onclick="showDeleteModal(\'' + game.id + '\', \'' + escapeHtml(game.name) + '\')">🗑️ 삭제</button>' +
+                '</div>' +
                 
-                <div class="comments-section">
-                    <div class="comments-header">💬 댓글 (${game.comments ? game.comments.length : 0})</div>
+                '<div class="comments-section">' +
+                    '<div class="comments-header">💬 댓글 (' + (game.comments ? game.comments.length : 0) + ')</div>' +
                     
-                    <div class="comment-form">
-                        <input type="text" placeholder="닉네임" id="commentName-${game.id}" style="margin-bottom: 8px;">
-                        <textarea placeholder="댓글을 작성하세요..." id="commentText-${game.id}"></textarea>
-                        <button class="btn btn-small" onclick="addComment('${game.id}')">댓글 달기</button>
-                    </div>
+                    '<div class="comment-form">' +
+                        '<input type="text" placeholder="닉네임" id="commentName-' + game.id + '" style="margin-bottom: 8px;">' +
+                        '<textarea placeholder="댓글을 작성하세요..." id="commentText-' + game.id + '"></textarea>' +
+                        '<button class="btn btn-small" onclick="addComment(\'' + game.id + '\')">댓글 달기</button>' +
+                    '</div>' +
                     
-                    <div id="comments-${game.id}">
-                        ${(game.comments || []).map(comment => `
-                            <div class="comment">
-                                <div class="comment-author">${escapeHtml(comment.author)}</div>
-                                <div class="comment-text">${escapeHtml(comment.text)}</div>
-                                <small style="color: #888;">${comment.date}</small>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+                    '<div id="comments-' + game.id + '">' +
+                        (game.comments || []).map((comment, index) => 
+                            '<div class="comment" id="comment-' + game.id + '-' + index + '">' +
+                                '<div class="comment-author">' + escapeHtml(comment.author) + '</div>' +
+                                '<div class="comment-text" id="commentText-' + game.id + '-' + index + '">' + escapeHtml(comment.text) + '</div>' +
+                                '<small style="color: #888;">' + comment.date + '</small>' +
+                                '<div class="comment-actions">' +
+                                    '<button class="btn-tiny btn-edit-comment" onclick="editComment(\'' + game.id + '\', ' + index + ')">편집</button>' +
+                                    '<button class="btn-tiny btn-delete-comment" onclick="deleteComment(\'' + game.id + '\', ' + index + ')">삭제</button>' +
+                                '</div>' +
+                                '<div class="comment-edit-form" id="editForm-' + game.id + '-' + index + '">' +
+                                    '<textarea id="editCommentText-' + game.id + '-' + index + '">' + escapeHtml(comment.text) + '</textarea>' +
+                                    '<div class="comment-edit-buttons">' +
+                                        '<button class="btn btn-small" onclick="saveCommentEdit(\'' + game.id + '\', ' + index + ')" style="background: #28a745;">저장</button>' +
+                                        '<button class="btn btn-small" onclick="cancelCommentEdit(\'' + game.id + '\', ' + index + ')" style="background: #6c757d;">취소</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
+                        ).join('') +
+                    '</div>' +
+                '</div>';
 
             return card;
         }
 
-        // 전역 함수들
+        // 게임 편집 관련 함수들
+        async function showEditModal(gameId) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            try {
+                const doc = await db.collection('games').doc(gameId).get();
+                if (doc.exists) {
+                    const game = doc.data();
+                    gameToEdit = gameId;
+                    
+                    document.getElementById('editGameName').value = game.name || '';
+                    document.getElementById('editAuthorName').value = game.author || '';
+                    document.getElementById('editGameDescription').value = game.description || '';
+                    
+                    document.getElementById('editGameModal').style.display = 'block';
+                    
+                    const saveBtn = document.getElementById('saveEditBtn');
+                    saveBtn.onclick = () => saveGameEdit(gameId);
+                }
+            } catch (error) {
+                console.error('게임 정보 로딩 실패:', error);
+                alert('게임 정보를 불러오는데 실패했습니다.');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editGameModal').style.display = 'none';
+            gameToEdit = null;
+        }
+
+        async function saveGameEdit(gameId) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            const newName = document.getElementById('editGameName').value.trim();
+            const newAuthor = document.getElementById('editAuthorName').value.trim();
+            const newDescription = document.getElementById('editGameDescription').value.trim();
+
+            if (!newName || !newAuthor) {
+                alert('게임 이름과 제작자 이름은 필수입니다.');
+                return;
+            }
+
+            try {
+                await db.collection('games').doc(gameId).update({
+                    name: newName,
+                    author: newAuthor,
+                    description: newDescription
+                });
+
+                closeEditModal();
+                alert('게임 정보가 성공적으로 수정되었습니다.');
+            } catch (error) {
+                console.error('게임 정보 수정 실패:', error);
+                alert('게임 정보 수정에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // 댓글 편집/삭제 관련 함수들
+        function editComment(gameId, commentIndex) {
+            const textDiv = document.getElementById('commentText-' + gameId + '-' + commentIndex);
+            const editForm = document.getElementById('editForm-' + gameId + '-' + commentIndex);
+            
+            textDiv.style.display = 'none';
+            editForm.style.display = 'block';
+        }
+
+        function cancelCommentEdit(gameId, commentIndex) {
+            const textDiv = document.getElementById('commentText-' + gameId + '-' + commentIndex);
+            const editForm = document.getElementById('editForm-' + gameId + '-' + commentIndex);
+            
+            textDiv.style.display = 'block';
+            editForm.style.display = 'none';
+        }
+
+        async function saveCommentEdit(gameId, commentIndex) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            const newText = document.getElementById('editCommentText-' + gameId + '-' + commentIndex).value.trim();
+            
+            if (!newText) {
+                alert('댓글 내용을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const doc = await db.collection('games').doc(gameId).get();
+                if (doc.exists) {
+                    const game = doc.data();
+                    const comments = game.comments || [];
+                    
+                    if (commentIndex >= 0 && commentIndex < comments.length) {
+                        comments[commentIndex].text = newText;
+                        comments[commentIndex].editDate = new Date().toLocaleDateString('ko-KR');
+                        
+                        await db.collection('games').doc(gameId).update({
+                            comments: comments
+                        });
+                        
+                        alert('댓글이 성공적으로 수정되었습니다.');
+                    }
+                }
+            } catch (error) {
+                console.error('댓글 수정 실패:', error);
+                alert('댓글 수정에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        async function deleteComment(gameId, commentIndex) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            if (!confirm('이 댓글을 정말 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const doc = await db.collection('games').doc(gameId).get();
+                if (doc.exists) {
+                    const game = doc.data();
+                    const comments = game.comments || [];
+                    
+                    if (commentIndex >= 0 && commentIndex < comments.length) {
+                        comments.splice(commentIndex, 1);
+                        
+                        await db.collection('games').doc(gameId).update({
+                            comments: comments
+                        });
+                        
+                        alert('댓글이 성공적으로 삭제되었습니다.');
+                    }
+                }
+            } catch (error) {
+                console.error('댓글 삭제 실패:', error);
+                alert('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // 게임 삭제 관련 함수들
+        function showDeleteModal(gameId, gameName) {
+            gameToDelete = gameId;
+            document.getElementById('deleteGameTitle').textContent = '"' + gameName + '" 게임을 정말 삭제하시겠습니까?';
+            document.getElementById('deleteConfirmModal').style.display = 'block';
+            
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.onclick = () => deleteGame(gameId);
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+            gameToDelete = null;
+        }
+
+        async function deleteGame(gameId) {
+            if (!isFirebaseInitialized) {
+                alert('Firebase 연결을 확인해주세요.');
+                return;
+            }
+
+            try {
+                await db.collection('games').doc(gameId).delete();
+                
+                closeDeleteModal();
+                alert('게임이 성공적으로 삭제되었습니다.');
+            } catch (error) {
+                console.error('게임 삭제 실패:', error);
+                alert('게임 삭제에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // 댓글 추가 함수
         async function addComment(gameId) {
             if (!isFirebaseInitialized) {
                 alert('Firebase 연결을 확인해주세요.');
                 return;
             }
 
-            const nameInput = document.getElementById(`commentName-${gameId}`);
-            const textInput = document.getElementById(`commentText-${gameId}`);
+            const nameInput = document.getElementById('commentName-' + gameId);
+            const textInput = document.getElementById('commentText-' + gameId);
             
             const name = nameInput.value.trim();
             const text = textInput.value.trim();
@@ -699,7 +1052,6 @@
                     date: new Date().toLocaleDateString('ko-KR')
                 };
 
-                // Firestore에 댓글 추가
                 await db.collection('games').doc(gameId).update({
                     comments: firebase.firestore.FieldValue.arrayUnion(comment)
                 });
@@ -712,9 +1064,9 @@
             }
         }
 
+        // 전체화면 관련 함수들
         function openFullscreen(gameId) {
-            // 현재 로드된 게임들에서 찾기
-            const gameCard = document.querySelector(`[onclick="openFullscreen('${gameId}')"]`).closest('.game-card');
+            const gameCard = document.querySelector('[onclick="openFullscreen(\'' + gameId + '\')"]').closest('.game-card');
             const iframe = gameCard.querySelector('.game-iframe');
             const title = gameCard.querySelector('.game-title').textContent;
             const author = gameCard.querySelector('.game-author').textContent;
@@ -723,7 +1075,7 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalIframe = document.getElementById('modalIframe');
 
-            modalTitle.textContent = `${title} - ${author}`;
+            modalTitle.textContent = title + ' - ' + author;
             modalIframe.srcdoc = iframe.srcdoc;
             modal.style.display = 'block';
         }
@@ -740,18 +1092,24 @@
             return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
-        // ESC 키로 전체화면 닫기
+        // 키보드 및 모달 이벤트 처리
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeFullscreen();
                 closeDeleteModal();
+                closeEditModal();
             }
         });
 
-        // 모달 외부 클릭시 닫기
         document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeDeleteModal();
+            }
+        });
+
+        document.getElementById('editGameModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
             }
         });
 
